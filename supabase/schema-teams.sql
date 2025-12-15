@@ -45,21 +45,21 @@ ALTER TABLE projects ALTER COLUMN user_id DROP NOT NULL;
 DO $$
 DECLARE
   user_record RECORD;
-  team_id UUID;
+  new_team_id UUID;
 BEGIN
   FOR user_record IN SELECT DISTINCT user_id FROM projects WHERE user_id IS NOT NULL
   LOOP
     -- Create personal team
     INSERT INTO teams (name, description, created_by)
     VALUES ('Personal Workspace', 'Your personal workspace', user_record.user_id)
-    RETURNING id INTO team_id;
+    RETURNING id INTO new_team_id;
     
     -- Add user as admin
     INSERT INTO team_members (team_id, user_id, role)
-    VALUES (team_id, user_record.user_id, 'admin');
+    VALUES (new_team_id, user_record.user_id, 'admin');
     
     -- Assign user's projects to their personal team
-    UPDATE projects SET team_id = team_id WHERE user_id = user_record.user_id;
+    UPDATE projects SET team_id = new_team_id WHERE user_id = user_record.user_id;
   END LOOP;
 END $$;
 
