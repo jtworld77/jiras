@@ -17,41 +17,51 @@ export default function LoginForm() {
     setLoading(true);
     setMessage('');
 
-    if (isSignUp) {
-      // Sign up
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
-      if (error) {
-        setMessage(error.message);
-      } else {
-        setMessage('Account created! Logging you in...');
-        // Auto login after signup
-        const { error: signInError } = await supabase.auth.signInWithPassword({
+    try {
+      if (isSignUp) {
+        // Sign up
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
         });
+
+        if (error) {
+          setMessage('Error: ' + error.message);
+          setLoading(false);
+          return;
+        }
         
-        if (!signInError) {
-          router.push('/projects');
-          router.refresh();
+        if (data.user) {
+          setMessage('Success! Redirecting...');
+          // Wait a moment then redirect
+          setTimeout(() => {
+            window.location.href = '/projects';
+          }, 500);
+        }
+      } else {
+        // Sign in
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) {
+          setMessage('Error: ' + error.message);
+          setLoading(false);
+          return;
+        }
+        
+        if (data.session) {
+          setMessage('Success! Redirecting...');
+          // Wait a moment then redirect
+          setTimeout(() => {
+            window.location.href = '/projects';
+          }, 500);
         }
       }
-    } else {
-      // Sign in
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        setMessage(error.message);
-      } else {
-        router.push('/projects');
-        router.refresh();
-      }
+    } catch (err) {
+      setMessage('Error: ' + (err as Error).message);
+      setLoading(false);
     }
 
     setLoading(false);
