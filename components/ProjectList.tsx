@@ -5,7 +5,15 @@ import Link from 'next/link';
 import { createProject, deleteProject } from '@/lib/queries/projects';
 import type { Project } from '@/types';
 
-export default function ProjectList({ initialProjects }: { initialProjects: Project[] }) {
+export default function ProjectList({ 
+  initialProjects,
+  teamId,
+  canManage = true
+}: { 
+  initialProjects: Project[];
+  teamId?: string;
+  canManage?: boolean;
+}) {
   const [projects, setProjects] = useState(initialProjects);
   const [isCreating, setIsCreating] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
@@ -13,10 +21,10 @@ export default function ProjectList({ initialProjects }: { initialProjects: Proj
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newProjectName.trim()) return;
+    if (!newProjectName.trim() || !teamId) return;
 
     try {
-      const project = await createProject(newProjectName, newProjectDescription || undefined);
+      const project = await createProject(teamId, newProjectName, newProjectDescription || undefined);
       setProjects([project, ...projects]);
       setNewProjectName('');
       setNewProjectDescription('');
@@ -39,7 +47,7 @@ export default function ProjectList({ initialProjects }: { initialProjects: Proj
 
   return (
     <div className="space-y-4">
-      {!isCreating && (
+      {!isCreating && canManage && (
         <button
           onClick={() => setIsCreating(true)}
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
@@ -87,24 +95,26 @@ export default function ProjectList({ initialProjects }: { initialProjects: Proj
         {projects.map((project) => (
           <div key={project.id} className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start mb-2">
-              <Link href={`/projects/${project.id}`} className="flex-1">
+              <Link href={`/teams/${teamId}/projects/${project.id}`} className="flex-1">
                 <h3 className="text-lg font-semibold text-gray-900 hover:text-indigo-600">
                   {project.name}
                 </h3>
               </Link>
-              <button
-                onClick={() => handleDelete(project.id)}
-                className="text-gray-400 hover:text-red-600 ml-2"
-                aria-label="Delete project"
-              >
-                ×
-              </button>
+              {canManage && (
+                <button
+                  onClick={() => handleDelete(project.id)}
+                  className="text-gray-400 hover:text-red-600 ml-2"
+                  aria-label="Delete project"
+                >
+                  ×
+                </button>
+              )}
             </div>
             {project.description && (
               <p className="text-sm text-gray-600 mb-4">{project.description}</p>
             )}
             <Link
-              href={`/projects/${project.id}`}
+              href={`/teams/${teamId}/projects/${project.id}`}
               className="text-sm text-indigo-600 hover:text-indigo-800"
             >
               View board →

@@ -1,8 +1,41 @@
+export type Team = {
+  id: string;
+  name: string;
+  description: string | null;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type TeamRole = 'admin' | 'member' | 'viewer';
+
+export type TeamMember = {
+  id: string;
+  team_id: string;
+  user_id: string;
+  role: TeamRole;
+  invited_by: string | null;
+  joined_at: string;
+};
+
+export type TeamInvitation = {
+  id: string;
+  team_id: string;
+  email: string;
+  role: TeamRole;
+  invited_by: string;
+  token: string;
+  expires_at: string;
+  accepted_at: string | null;
+  created_at: string;
+};
+
 export type Project = {
   id: string;
   name: string;
   description: string | null;
-  user_id: string;
+  team_id: string;
+  user_id: string | null;
   created_at: string;
   updated_at: string;
 };

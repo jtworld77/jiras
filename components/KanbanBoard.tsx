@@ -28,9 +28,11 @@ const COLUMNS: { id: Status; title: string }[] = [
 export default function KanbanBoard({
   projectId,
   initialIssues,
+  canEdit = true,
 }: {
   projectId: string;
   initialIssues: Issue[];
+  canEdit?: boolean;
 }) {
   const [issues, setIssues] = useState(initialIssues);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -157,6 +159,7 @@ export default function KanbanBoard({
                   projectId={projectId}
                   onIssueCreated={handleIssueCreated}
                   onIssueClick={setSelectedIssue}
+                  canEdit={canEdit}
                 />
               </SortableContext>
             );

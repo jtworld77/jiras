@@ -33,9 +33,17 @@ export default function LoginForm() {
         
         if (data.user) {
           setMessage('Success! Redirecting...');
+          // Check if there's an invitation token in URL
+          const params = new URLSearchParams(window.location.search);
+          const inviteToken = params.get('invite');
+          
           // Wait a moment then redirect
           setTimeout(() => {
-            window.location.href = '/projects';
+            if (inviteToken) {
+              window.location.href = `/invitations/${inviteToken}`;
+            } else {
+              window.location.href = '/teams';
+            }
           }, 500);
         }
       } else {
@@ -53,9 +61,17 @@ export default function LoginForm() {
         
         if (data.session) {
           setMessage('Success! Redirecting...');
+          // Check if there's an invitation token in URL
+          const params = new URLSearchParams(window.location.search);
+          const inviteToken = params.get('invite');
+          
           // Wait a moment then redirect
           setTimeout(() => {
-            window.location.href = '/projects';
+            if (inviteToken) {
+              window.location.href = `/invitations/${inviteToken}`;
+            } else {
+              window.location.href = '/teams';
+            }
           }, 500);
         }
       }

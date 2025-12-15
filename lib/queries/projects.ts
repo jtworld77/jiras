@@ -1,10 +1,11 @@
 import { supabase } from '@/lib/supabase/client';
 import type { Project } from '@/types';
 
-export async function getProjects() {
+export async function getProjectsByTeam(teamId: string) {
   const { data, error } = await supabase
     .from('projects')
     .select('*')
+    .eq('team_id', teamId)
     .order('created_at', { ascending: false });
 
   if (error) throw error;
@@ -22,13 +23,13 @@ export async function getProject(id: string) {
   return data as Project;
 }
 
-export async function createProject(name: string, description?: string) {
+export async function createProject(teamId: string, name: string, description?: string) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
   const { data, error } = await supabase
     .from('projects')
-    .insert({ name, description, user_id: user.id })
+    .insert({ team_id: teamId, name, description, user_id: user.id })
     .select()
     .single();
 

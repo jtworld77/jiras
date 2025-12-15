@@ -14,6 +14,7 @@ export default function KanbanColumn({
   projectId,
   onIssueCreated,
   onIssueClick,
+  canEdit = true,
 }: {
   id: string;
   title: string;
@@ -21,6 +22,7 @@ export default function KanbanColumn({
   projectId: string;
   onIssueCreated: (issue: Issue) => void;
   onIssueClick: (issue: Issue) => void;
+  canEdit?: boolean;
 }) {
   const [isAdding, setIsAdding] = useState(false);
   const [newIssueTitle, setNewIssueTitle] = useState('');
@@ -73,7 +75,7 @@ export default function KanbanColumn({
         )}
       </div>
 
-      {!isAdding && (
+      {!isAdding && canEdit && (
         <button
           onClick={() => setIsAdding(true)}
           className="mt-2 w-full text-left px-2 py-1 text-sm text-gray-600 hover:bg-gray-200 rounded"
