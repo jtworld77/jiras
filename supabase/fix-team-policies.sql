@@ -1,14 +1,26 @@
 -- Fix infinite recursion in team_members policies
 
--- Drop problematic policies
+-- Drop ALL team_members policies (they're causing recursion)
+DROP POLICY IF EXISTS "Users can view team members of their teams" ON team_members;
 DROP POLICY IF EXISTS "Team admins can add members" ON team_members;
 DROP POLICY IF EXISTS "Team admins can update members" ON team_members;
+DROP POLICY IF EXISTS "Team admins and users themselves can remove members" ON team_members;
 
--- Recreate with simpler logic (bypass recursion)
-CREATE POLICY "Team admins can add members"
+-- Create simple non-recursive policies
+-- Allow users to view any team_members (filtered in app)
+CREATE POLICY "Users can view team members"
+  ON team_members FOR SELECT
+  USING (true);
+
+-- Allow authenticated users to manage team_members (validated in app)
+CREATE POLICY "Authenticated users can add members"
   ON team_members FOR INSERT
-  WITH CHECK (true);  -- Will be validated in application code
+  WITH CHECK (auth.uid() IS NOT NULL);
 
-CREATE POLICY "Team admins can update members"
+CREATE POLICY "Authenticated users can update members"
   ON team_members FOR UPDATE
-  USING (true);  -- Will be validated in application code
+  USING (auth.uid() IS NOT NULL);
+
+CREATE POLICY "Users can remove members"
+  ON team_members FOR DELETE
+  USING (auth.uid() IS NOT NULL);
