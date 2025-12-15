@@ -24,8 +24,8 @@ export default function TeamsIndexPage() {
       }
     } catch (error: any) {
       console.error('Error loading teams:', error);
-      // If the teams table doesn't exist (migration not run), show error
-      setError('Database migration required. Please run schema-teams.sql in Supabase.');
+      // Show the actual error for debugging
+      setError(`Error: ${error.message || error.toString()}`);
     }
   }
 
